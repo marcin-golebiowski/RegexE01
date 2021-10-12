@@ -16,28 +16,53 @@ namespace RegularExpressionsWalks
             Assert.NotNull(match);
             Assert.Equal("ac", match.Value);
         }
+
         [Fact]
         public void LookAheadPositive_Before()
         {
             var pattern = new Regex(@"(?=ab)\b[a-z]+");
-            var text = "ax acad abaaaaa";
+            var text = "ax acad abaaaaa xxxabxxxx";
 
-            var match = pattern.Match(text);
+            var matches = pattern.Matches(text);
+            Assert.Single(matches);
+        }
 
-            Assert.NotNull(match);
-            Assert.Equal("abaaaaa", match.Value);
+        [Fact]
+        public void LookAheadPositive2_Before()
+        {
+            var pattern = new Regex(@"(?=[^ .]*ab[^ .]*)\b[a-z]+");
+            var text = "ax acad abaaaaa xxxabxxxx";
+
+            var matches = pattern.Matches(text);
+            Assert.Equal(2, matches.Count);
+            Assert.Equal("abaaaaa", matches[0].Value);
+            Assert.Equal("xxxabxxxx", matches[1].Value);
         }
 
         [Fact]
         public void LookAheadNegative_Before()
         {
             var pattern = new Regex(@"(?!ab)\b[a-z]+");
-            var text = "ab acad abaaaaa";
+            var text = "ab acad abaaaaa aabxxx";
 
-            var match = pattern.Match(text);
+            var matches = pattern.Matches(text);
 
-            Assert.NotNull(match);
-            Assert.Equal("acad", match.Value);
+            Assert.NotNull(matches);
+            Assert.Equal("acad", matches[0].Value);
+            Assert.Equal("aabxxx", matches[1].Value);
+        }
+
+        [Fact]
+        public void LookAheadNegative2_Before()
+        {
+            var pattern = new Regex(@"(?![^ .]*ab[^ .]*)\b[a-z]+");
+            var text = "ab acad abaaaaa aabxxx";
+
+            var matches = pattern.Matches(text);
+
+            Assert.NotNull(matches);
+            Assert.Single(matches);
+            Assert.Equal("acad", matches[0].Value);
         }
 
         [Fact]
@@ -45,6 +70,19 @@ namespace RegularExpressionsWalks
         {
             var pattern = new Regex(@"(?<=I love )You");
             var text = "I love You";
+
+            var match = pattern.Match(text);
+
+            Assert.NotNull(match);
+            Assert.Equal("You", match.Value);
+        }
+
+
+        [Fact]
+        public void LookBehindPositive2_Before()
+        {
+            var pattern = new Regex(@"(?<=.*I love.* )You");
+            var text = "I love very much You";
 
             var match = pattern.Match(text);
 
@@ -62,6 +100,18 @@ namespace RegularExpressionsWalks
 
             Assert.NotNull(match);
             Assert.Equal("You", match.Value);
+        }
+
+        [Fact]
+        public void LookBehindNegative2_Before()
+        {
+            var pattern = new Regex(@"(?<!.*I hate.* )You");
+            var text = "I hate and love You";
+
+            var matches = pattern.Matches(text);
+
+            Assert.NotNull(matches);
+            Assert.Empty(matches);
         }
     }
 }
